@@ -14,6 +14,7 @@ A local simplified Kibana
 ## development
 
 ```bash
+cd backend/
 npm run tauri dev
 ```
 
@@ -23,11 +24,13 @@ open the Development Console using `CMD + Option + i`
 
 ```bash
 brew install babashka
+cd backend/
 cp /usr/local/bin/bb binaries/bb-x86_64-apple-darwin
 ```
 
 ## creating a release
 
 ```bash
+cd backend/
 npm run tauri build
 ```

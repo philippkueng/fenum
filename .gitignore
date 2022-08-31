@@ -1,7 +1,7 @@
 .clj-kondo
 .idea
 .DS_Store
-fenum/node_modules
-fenum/binaries
-fenum/src-tauri/binaries
+backend/node_modules
+backend/binaries
+backend/src-tauri/binaries
 *.iml
