@@ -34,7 +34,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.bitfondue.development",
+      "identifier": "com.fenum.development",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
