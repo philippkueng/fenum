@@ -18,6 +18,13 @@ cd backend/
 npm run tauri dev
 ```
 
+```bash
+#cd fenum/
+#npx shadow-cljs browser-repl
+cd shadow-cljs-tailwindcss/
+npx run dev
+```
+
 open the Development Console using `CMD + Option + i`
 
 ## prepare the binaries
