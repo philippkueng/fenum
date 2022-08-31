@@ -8,36 +8,6 @@ use tauri::{
   Manager,
 };
 
-// #[tauri::command]
-// fn greet(name: &str) -> String {
-//   format!("Hello, {}!", name)
-// }
-
-// fn main() {
-//   let (mut rx, mut child) = Command::new_sidecar("background-process")
-//       .expect("failed to create `background-process` binary command")
-//       .spawn()
-//       .expect("Failed to spawn sidecar");
-//
-//   tauri::async_runtime::spawn(async move {
-//     // read events such as stdout
-//     while let Some(event) = rx.recv().await {
-//       if let CommandEvent::Stdout(line) = event {
-//         window
-//             .emit("message", Some(format!("'{}'", line)))
-//             .expect("failed to emit event");
-//         // write to stdin
-//         child.write("message from Rust\n".as_bytes()).unwrap();
-//       }
-//     }
-//   });
-//
-//   tauri::Builder::default()
-//       .invoke_handler(tauri::generate_handler![greet])
-//       .run(tauri::generate_context!())
-//       .expect("error while running tauri application");
-// }
-
 fn main() {
   tauri::Builder::default()
       .setup(|app| {
