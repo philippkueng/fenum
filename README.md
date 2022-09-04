@@ -19,9 +19,7 @@ npm run tauri dev
 ```
 
 ```bash
-#cd fenum/
-#npx shadow-cljs browser-repl
-cd shadow-cljs-tailwindcss/
+cd frontend/
 npx run dev
 ```
 
@@ -38,6 +36,5 @@ cp /usr/local/bin/bb binaries/bb-x86_64-apple-darwin
 ## creating a release
 
 ```bash
-cd backend/
-npm run tauri build
+bb build-release
 ```
