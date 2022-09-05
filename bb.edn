@@ -1,4 +1,11 @@
-{:tasks {build-release (do
+{:tasks {deps (do (shell {:dir "frontend"} "npm install")
+                  (shell {:dir "backend"} "npm install"))
+         dev-frontend (shell {:dir "frontend"} "npm run dev")
+         dev-backend (shell {:dir "backend"} "npm run tauri dev")
+         ;-dev {:depends [dev-frontend dev-backend]}
+         ;dev {:doc "Starts the front- and backend"
+         ;     :task (run 'dev {:parallel true})}
+         build-release (do
                          (shell {:dir "frontend"}
                            "npm run release")
                          (shell {:dir "backend"}
