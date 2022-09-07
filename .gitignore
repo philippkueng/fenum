@@ -4,4 +4,5 @@
 backend/node_modules
 backend/binaries
 backend/src-tauri/binaries
+backend/*.edn
 *.iml
