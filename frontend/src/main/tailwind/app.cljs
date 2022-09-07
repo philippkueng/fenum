@@ -3,6 +3,20 @@
             [tailwind.views :as views]
             [tailwind.db :as db]))
 
+(defn start-sidecar-process
+  []
+  (-> js/window
+    (aget "__TAURI__")
+    (aget "shell")
+    (aget "Command")
+    ((fn [obj]
+       (.sidecar ^js obj
+         "binaries/bb"
+         (clj->js ["/Users/philippkueng/Downloads/http-server.clj"]))))
+    ;; start the sidecar process
+    ((fn [obj]
+       (.execute ^js obj)))))
+
 (defn app
   []
   (if (:auth? @db/state)
@@ -12,7 +26,8 @@
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load start []
   (dom/render [app]
-    (.getElementById js/document "app")))
+    (.getElementById js/document "app"))
+  (start-sidecar-process))
 
 (defn init []
   ;; init is called ONCE when the page loads
