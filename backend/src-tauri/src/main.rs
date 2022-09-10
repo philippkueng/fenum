@@ -3,6 +3,8 @@
   windows_subsystem = "windows"
 )]
 
+use tauri_plugin_sql::TauriSql;
+
 use tauri::{
   api::process::{Command, CommandEvent},
   Manager,
@@ -35,6 +37,7 @@ fn main() {
 
         Ok(())
       })
+      .plugin(TauriSql::default())
       .run(tauri::generate_context!())
       .expect("error while running tauri application");
 }

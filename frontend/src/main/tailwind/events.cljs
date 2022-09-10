@@ -13,3 +13,7 @@
   []
   (let [dropdown (:user-dropdown? @db/state)]
     (swap! db/state assoc :user-dropdown? (not dropdown))))
+
+(defn load-sqlite-database
+  [sqlite-db]
+  (swap! db/state assoc :sqlite-db sqlite-db))

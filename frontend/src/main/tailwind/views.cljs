@@ -1,6 +1,8 @@
 (ns tailwind.views
   (:require [tailwind.events :as events]
-            [tailwind.db :as db]))
+            [tailwind.db :as db]
+            [cljs.pprint :refer [pprint]]
+            ["tauri-plugin-sql-api$default" :as Database]))
 
 (defn public
   []
@@ -102,54 +104,89 @@
                  :on-change #(println (-> % .-target .-value))}]]]
       [:div {:class "basis-1/4 pl-2 flex justify-end space-x-2"}
        [:button {:class "h-10 px-6 w-1/2 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"} "From"]
-       [:button {:class "h-10 px-6 w-1/2 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"} "To"]]]
+       [:button {:class "h-10 px-6 w-1/2 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+                 :on-click #(println "TODO - clicked the `To` button")} "To"]]]
 
      ;; results
+     #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
+        [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
+         [:table {:class "w-full text-sm text-left text-gray-500"}
+          [:thead {:class "text-xs text-gray-700 bg-gray-200"}
+           [:tr
+            [:th {:scope "col", :class "py-3 px-6"} "Product name"]
+            [:th {:scope "col", :class "py-3 px-6"}
+             [:div {:class "flex items-center"}
+              [:a {:href "#"}
+               "Color"
+               #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
+                  [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
+            [:th {:scope "col", :class "py-3 px-6"}
+             [:div {:class "flex items-center"}
+              [:a {:href "#"}
+               "Category"
+               #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
+                  [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
+            [:th {:scope "col", :class "py-3 px-6"}
+             [:div {:class "flex items-center"}
+              [:a {:href "#"}
+               "Price"
+               #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
+                  [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
+            [:th {:scope "col", :class "py-3 px-6"}
+             [:span {:class "sr-only"} "Edit"]]]]
+          [:tbody
+           [:tr {:class "bg-white border-b"}
+            [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Apple MacBook Pro 17"]
+            [:td {:class "py-4 px-6"}]
+            [:td {:class "py-4 px-6"}]
+            [:td {:class "py-4 px-6"} "$2999"]
+            [:td {:class "py-4 px-6 text-right"}
+             [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
+           [:tr {:class "bg-white border-b"}
+            [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Microsoft Surface Pro"]
+            [:td {:class "py-4 px-6"}]
+            [:td {:class "py-4 px-6"} "Laptop PC"]
+            [:td {:class "py-4 px-6"} "$1999"]
+            [:td {:class "py-4 px-6 text-right"}
+             [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
+           [:tr {:class "bg-white"}
+            [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Magic Mouse 2"]
+            [:td {:class "py-4 px-6"}]
+            [:td {:class "py-4 px-6"}]
+            [:td {:class "py-4 px-6"} "$99"]
+            [:td {:class "py-4 px-6 text-right"}
+             [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]
+
      [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
-      [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
-       [:table {:class "w-full text-sm text-left text-gray-500"}
-        [:thead {:class "text-xs text-gray-700 bg-gray-200"}
-         [:tr
-          [:th {:scope "col", :class "py-3 px-6"} "Product name"]
-          [:th {:scope "col", :class "py-3 px-6"}
-           [:div {:class "flex items-center"}
-            [:a {:href "#"}
-             "Color"
-             #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-              [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-          [:th {:scope "col", :class "py-3 px-6"}
-           [:div {:class "flex items-center"}
-            [:a {:href "#"}
-             "Category"
-             #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-              [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-          [:th {:scope "col", :class "py-3 px-6"}
-           [:div {:class "flex items-center"}
-            [:a {:href "#"}
-             "Price"
-             #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-              [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-          [:th {:scope "col", :class "py-3 px-6"}
-           [:span {:class "sr-only"} "Edit"]]]]
-        [:tbody
-         [:tr {:class "bg-white border-b"}
-          [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Apple MacBook Pro 17"]
-          [:td {:class "py-4 px-6"} ]
-          [:td {:class "py-4 px-6"} ]
-          [:td {:class "py-4 px-6"} "$2999"]
-          [:td {:class "py-4 px-6 text-right"}
-           [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
-         [:tr {:class "bg-white border-b"}
-          [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Microsoft Surface Pro"]
-          [:td {:class "py-4 px-6"} ]
-          [:td {:class "py-4 px-6"} "Laptop PC"]
-          [:td {:class "py-4 px-6"} "$1999"]
-          [:td {:class "py-4 px-6 text-right"}
-           [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
-         [:tr {:class "bg-white"}
-          [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Magic Mouse 2"]
-          [:td {:class "py-4 px-6"} ]
-          [:td {:class "py-4 px-6"} ]
-          [:td {:class "py-4 px-6"} "$99"]
-          [:td {:class "py-4 px-6 text-right"}
-           [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]]]])
+      [:pre (with-out-str (pprint (dissoc @db/state :auth?)))]]
+
+     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
+      [:button
+       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+        :on-click #(do (println "clicked the button")
+                       (.then
+                         (.select ^js (:sqlite-db @db/state) "select name from sqlite_schema")
+                         (fn [result]
+                           (do
+                             (swap! db/state assoc :query-result (js->clj result :keywordize-keys true))
+                             (js/console.log result)))))}
+       "Query the Database"]
+      [:button
+       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+        :on-click #(swap! db/state dissoc :query-result)}
+       "Clear the result"]]
+     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
+      [:input
+       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+        :type "file"
+        :id "file-upload"
+        :on-change #(js/console.log (-> % .-target .-files))}]]
+     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
+      [:button
+       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+        :on-click #(do (println "clicked the button")
+                       (let [db-path "/Users/philippkueng/Documents/Programmieren/Clojure/fenum/backend/test.db"]
+                         (.then (.load Database (str "sqlite:" db-path))
+                           (fn [database]
+                             (events/load-sqlite-database database)))))}
+       "Load a different database"]]]]])
