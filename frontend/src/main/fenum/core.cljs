@@ -1,4 +1,4 @@
-(ns fenum.app
+(ns fenum.core
   (:require [reagent.dom :as dom]
             [fenum.views :as views]
             [fenum.db :as db]
