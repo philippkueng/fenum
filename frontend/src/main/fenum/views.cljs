@@ -1,41 +1,12 @@
 (ns fenum.views
   (:require [fenum.events :as events]
+            [fenum.subscriptions :as subscriptions]
             [fenum.db :as db]
+            [re-frame.core :as re-frame]
             [cljs.pprint :refer [pprint]]
             ["tauri-plugin-sql-api$default" :as Database]))
 
-(defn public
-  []
-  [:div {:class "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"}
-   [:div {:class "sm:mx-auto sm:w-full sm:max-w-md"}
-    [:h2 {:class "mt-6 text-center text-3xl font-extrabold text-gray-900"} "Sign in to your account"]
-    [:p {:class "mt-2 text-center text-sm text-gray-600 max-w"} "Or "
-     [:a {:href "#" :class "font-medium text-pink-600 hover:text-pink-500"} "start your 14-day free trial"]]]
-   [:div {:class "mt-8 sm:mx-auto sm:w-full sm:max-w-md"}
-    [:div {:class "bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10"}
-     [:form {:class "space-y-6" :action "#" :method "POST"}
-      [:div
-       [:label {:for "email" :class "block text-sm font-medium text-gray-700"} "Email address"]
-       [:div {:class "mt-1"}
-        [:input {:id "email" :name "email" :type "email" :auto-complete "email" :required true :class "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"}]]]
-      [:div
-       [:label {:for "password" :class "block text-sm font-medium text-gray-700"} "Password"]
-       [:div {:class "mt-1"}
-        [:input {:id "password" :name "password" :type "password" :auto-complete "current-password" :required true :class "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm"}]]]
-      [:div {:class "flex items-center justify-between"}
-       [:div {:class "flex items-center"}
-        [:input {:id "remember_me" :name "remember_me" :type "checkbox" :class "h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"}]
-        [:label {:for "remember_me" :class "ml-2 block text-sm text-gray-900"} "Remember me"]]
-       [:div {:class "text-sm"}
-        [:a {:href "#" :class "font-medium text-pink-600 hover:text-pink-500"} "Forgot your password?"]]]
-      [:div
-       [:button
-        {:type "submit"
-         :on-click #(events/login)
-         :class "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"}
-        "Sign in"]]]]]])
-
-(defn authenticated
+(defn main-panel
   []
   [:div {:class "h-screen flex overflow-hidden bg-white"}
    [:div {:class "hidden lg:flex lg:flex-shrink-0"}
@@ -47,7 +18,9 @@
       [:div {:class "px-3 mt-6 relative inline-block text-left"}
        [:div
         [:button {:type "button"
-                  :on-click #(events/toggle-user-dropdown)
+                  :on-click #(do
+                               (println "clicked the button")
+                               (re-frame/dispatch [::events/toggle-user-dropdown]))
                   :class "group w-full bg-gray-100 rounded-md px-3.5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-pink-500"
                   :id "options-menu"
                   :aria-expanded "false"
@@ -61,17 +34,18 @@
             [:span {:class "text-gray-500 text-sm truncate"} "@jessyschwarz"]]]
           [:svg {:class "flex-shrink-0 h-5 w-5 text-gray-400 group-hover:text-gray-500" :xmlns "http://www.w3.org/2000/svg" :viewBox "0 0 20 20" :fill "currentColor" :aria-hidden "true"}
            [:path {:fill-rule "evenodd" :d "M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" :clip-rule "evenodd"}]]]]]
-       (when (:user-dropdown? @db/state)
-         [:div {:class "z-10 mx-3 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 focus:outline-none" :role "menu" :aria-orientation "vertical" :aria-labelledby "options-menu"}
-          [:div {:class "py-1" :role "none"}
-           [:a {:href "#" :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"} "View profile"]
-           [:a {:href "#" :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"} "Settings"]
-           [:a {:href "#" :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"} "Notifications"]]
-          [:div {:class "py-1" :role "none"}
-           [:a {:href "#"
-                :on-click #(events/logout)
-                :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"}
-            "Logout"]]])]
+       (let [display-dropdown? (re-frame/subscribe [::subscriptions/user-dropdown?])]
+         (when @display-dropdown?
+           [:div {:class "z-10 mx-3 origin-top absolute right-0 left-0 mt-1 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200 focus:outline-none" :role "menu" :aria-orientation "vertical" :aria-labelledby "options-menu"}
+            [:div {:class "py-1" :role "none"}
+             [:a {:href "#" :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"} "View profile"]
+             [:a {:href "#" :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"} "Settings"]
+             [:a {:href "#" :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"} "Notifications"]]
+            [:div {:class "py-1" :role "none"}
+             [:a {:href "#"
+                  :on-click #(println "not implemented")
+                  :class "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" :role "menuitem"}
+              "Logout"]]]))]
       [:nav {:class "px-3 mt-6"}
        [:div {:class "space-y-1"}
         [:a {:href "#" :class "bg-gray-200 text-gray-900 group flex items-center px-2 py-2 text-sm font-medium rounded-md"}
@@ -158,35 +132,35 @@
              [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]
 
      [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
-      [:pre (with-out-str (pprint (dissoc @db/state :auth?)))]]
+      [:pre (with-out-str (pprint (re-frame/subscribe [::subscriptions/raw-database])))]]
 
-     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
-      [:button
-       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
-        :on-click #(do (println "clicked the button")
-                       (.then
-                         (.select ^js (:sqlite-db @db/state) "select name from sqlite_schema")
-                         (fn [result]
-                           (do
-                             (swap! db/state assoc :query-result (js->clj result :keywordize-keys true))
-                             (js/console.log result)))))}
-       "Query the Database"]
-      [:button
-       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
-        :on-click #(swap! db/state dissoc :query-result)}
-       "Clear the result"]]
-     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
-      [:input
-       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
-        :type "file"
-        :id "file-upload"
-        :on-change #(js/console.log (-> % .-target .-files))}]]
-     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
-      [:button
-       {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
-        :on-click #(do (println "clicked the button")
-                       (let [db-path "/Users/philippkueng/Documents/Programmieren/Clojure/fenum/backend/test.db"]
-                         (.then (.load Database (str "sqlite:" db-path))
-                           (fn [database]
-                             (events/load-sqlite-database database)))))}
-       "Load a different database"]]]]])
+     #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
+        [:button
+         {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+          :on-click #(do (println "clicked the button")
+                         (.then
+                           (.select ^js (:sqlite-db @db/state) "select name from sqlite_schema")
+                           (fn [result]
+                             (do
+                               (swap! db/state assoc :query-result (js->clj result :keywordize-keys true))
+                               (js/console.log result)))))}
+         "Query the Database"]
+        [:button
+         {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+          :on-click #(swap! db/state dissoc :query-result)}
+         "Clear the result"]]
+     #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
+        [:input
+         {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+          :type "file"
+          :id "file-upload"
+          :on-change #(js/console.log (-> % .-target .-files))}]]
+     #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
+        [:button
+         {:class "h-10 px-6 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+          :on-click #(do (println "clicked the button")
+                         (let [db-path "/Users/philippkueng/Documents/Programmieren/Clojure/fenum/backend/test.db"]
+                           (.then (.load Database (str "sqlite:" db-path))
+                             (fn [database]
+                               (events/load-sqlite-database database)))))}
+         "Load a different database"]]]]])

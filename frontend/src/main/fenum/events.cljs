@@ -1,19 +1,18 @@
 (ns fenum.events
-  (:require [fenum.db :as db]))
+  (:require [fenum.db :as db]
+            [re-frame.core :as re-frame]))
 
-(defn login
-  []
-  (swap! db/state assoc :auth? true))
+(re-frame/reg-event-db
+  ::initialize-db
+  (fn [_ _]
+    db/default-db))
 
-(defn logout
-  []
-  (swap! db/state assoc :auth? false))
+(re-frame/reg-event-db
+  ::toggle-user-dropdown
+  (fn [db _]
+    (let [dropdown (:user-dropdown? db)]
+      (assoc db :user-dropdown? (not dropdown)))))
 
-(defn toggle-user-dropdown
-  []
-  (let [dropdown (:user-dropdown? @db/state)]
-    (swap! db/state assoc :user-dropdown? (not dropdown))))
-
-(defn load-sqlite-database
-  [sqlite-db]
-  (swap! db/state assoc :sqlite-db sqlite-db))
+#_(defn load-sqlite-database
+    [sqlite-db]
+    (swap! db/state assoc :sqlite-db sqlite-db))

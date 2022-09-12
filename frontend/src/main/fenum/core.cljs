@@ -1,14 +1,14 @@
 (ns fenum.core
-  (:require [reagent.dom :as dom]
+  (:require [reagent.dom :as rdom]
+            [re-frame.core :as re-frame]
             [fenum.views :as views]
-            [fenum.db :as db]
             [fenum.events :as events]
             ["tauri-plugin-sql-api$default" :as Database]))
 
-(defn load-database []
-  (.then (.load Database "sqlite:fenum.db")
-    (fn [database]
-      (events/load-sqlite-database database))))
+#_(defn load-database []
+    (.then (.load Database "sqlite:fenum.db")
+      (fn [database]
+        (events/load-sqlite-database database))))
 
 (comment
   (def db (atom nil))
@@ -34,25 +34,20 @@
   (println "testing")
   )
 
-(defn app
-  []
-  (if (:auth? @db/state)
-    [views/authenticated]
-    [views/public]))
-
 ;; start is called by init and after code reloading finishes
-(defn ^:dev/after-load start []
-  (dom/render [app]
-    (.getElementById js/document "app"))
-  #_(start-sidecar-process))
+(defn ^:dev/after-load mount-root []
+  (re-frame/clear-subscription-cache!)
+  (let [root-el (.getElementById js/document "app")]
+    (rdom/unmount-component-at-node root-el)
+    (rdom/render [views/main-panel] root-el)))
 
 (defn init []
   ;; init is called ONCE when the page loads
   ;; this is called in the index.html and must be exported
   ;; so it is available even in :advanced release builds
   (js/console.log "init")
-  (start)
-  (load-database))
+  (re-frame/dispatch-sync [::events/initialize-db])
+  (mount-root))
 
 ;; this is called before any code is reloaded
 (defn ^:dev/before-load stop []
