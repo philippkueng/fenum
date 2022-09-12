@@ -6,3 +6,4 @@ backend/binaries
 backend/src-tauri/binaries
 backend/*.edn
 *.iml
+*.db*
