@@ -1,4 +1,4 @@
-(ns tailwind.db
+(ns fenum.db
   (:require [reagent.core :as r]))
 
 (defonce state (r/atom {:auth? true

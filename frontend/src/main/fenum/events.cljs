@@ -1,5 +1,5 @@
-(ns tailwind.events
-  (:require [tailwind.db :as db]))
+(ns fenum.events
+  (:require [fenum.db :as db]))
 
 (defn login
   []

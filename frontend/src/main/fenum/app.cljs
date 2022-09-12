@@ -1,29 +1,9 @@
-(ns tailwind.app
+(ns fenum.app
   (:require [reagent.dom :as dom]
-            [tailwind.views :as views]
-            [tailwind.db :as db]
-            [tailwind.events :as events]
+            [fenum.views :as views]
+            [fenum.db :as db]
+            [fenum.events :as events]
             ["tauri-plugin-sql-api$default" :as Database]))
-
-#_(defn start-sidecar-process
-    []
-    (-> js/window
-      (aget "__TAURI__")
-      (aget "shell")
-      (aget "Command")
-      ((fn [obj]
-         (.sidecar ^js obj
-           "binaries/bb"
-           (clj->js
-             ["/Users/philippkueng/Downloads/http-server.clj"]
-             #_["./sidecar/http-server.clj"]
-             #_["sidecar/http-server.clj"]
-             #_["./../Resources/sidecar/http-server.clj"]
-             #_["./Resources/sidecar/http-server.clj"]
-             ))))
-      ;; start the sidecar process
-      ((fn [obj]
-         (.execute ^js obj)))))
 
 (defn load-database []
   (.then (.load Database "sqlite:fenum.db")

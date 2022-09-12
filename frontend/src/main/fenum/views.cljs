@@ -1,6 +1,6 @@
-(ns tailwind.views
-  (:require [tailwind.events :as events]
-            [tailwind.db :as db]
+(ns fenum.views
+  (:require [fenum.events :as events]
+            [fenum.db :as db]
             [cljs.pprint :refer [pprint]]
             ["tauri-plugin-sql-api$default" :as Database]))
 
