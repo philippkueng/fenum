@@ -2,7 +2,6 @@
   (:require [fenum.events :as events]
             [fenum.subscriptions :as subscriptions]
             [re-frame.core :as re-frame]
-            [clojure.string :as str]
             [cljs.pprint :refer [pprint]]))
 
 (defn- table-icon [selected?]
