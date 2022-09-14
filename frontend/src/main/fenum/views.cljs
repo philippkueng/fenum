@@ -1,6 +1,7 @@
 (ns fenum.views
   (:require [fenum.events :as events]
             [fenum.subscriptions :as subscriptions]
+            [fenum.utilities :as utilities]
             [re-frame.core :as re-frame]
             [cljs.pprint :refer [pprint]]))
 
@@ -120,7 +121,7 @@
          [:span {:class "text-gray-500 sm:text-sm"} "🔎"]]
         [:input {:type "text", :name "search", :id "search", :class "block w-full rounded-md border-gray-300 pl-10 pr-12 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", :placeholder "specific error message"
                  ;; just print the input to the console...
-                 :on-change #(println (-> % .-target .-value))}]]]
+                 :on-change #(println (utilities/value %))}]]]
       [:div {:class "basis-1/4 pl-2 flex justify-end space-x-2"}
        [:button {:class "h-10 px-6 w-1/2 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"} "From"]
        [:button {:class "h-10 px-6 w-1/2 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"

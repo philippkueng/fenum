@@ -3,41 +3,12 @@
             [re-frame.core :as re-frame]
             [fenum.views :as views]
             [fenum.events :as events]
-            ["tauri-plugin-sql-api$default" :as Database]))
-
-#_(defn load-database []
-    (.then (.load Database "sqlite:fenum.db")
-      (fn [database]
-        (events/load-sqlite-database database))))
-
-(comment
-  (def db (atom nil))
-
-  ;; create the database
-  (.then (.load Database "sqlite:fenum.db")
-    (fn [database]
-      (reset! db database)))
-
-  ;; await db.execute('INSERT INTO ...')
-  (.then
-    (.execute @db "create table something (id integer, text text)")
-    #(println "hopefully created the table"))
-
-  ;; insert a table
-
-  ;; query for the available tables?
-  (.then
-    (.select @db "select name from sqlite_schema")
-    #(js/console.log %))
-
-
-  (println "testing")
-  )
+            [fenum.utilities :as utilities]))
 
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load mount-root []
   (re-frame/clear-subscription-cache!)
-  (let [root-el (.getElementById js/document "app")]
+  (let [root-el (utilities/get-element-by-id "app")]
     (rdom/unmount-component-at-node root-el)
     (rdom/render [views/main-panel] root-el)))
 
