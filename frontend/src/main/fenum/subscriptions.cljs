@@ -26,3 +26,11 @@
   ::raw-database
   (fn [db]
     db))
+
+(re-frame/reg-sub
+  ::available-fields
+  (fn [db] (:available-fields db)))
+
+(re-frame/reg-sub
+  ::rows
+  (fn [db] (:rows db)))

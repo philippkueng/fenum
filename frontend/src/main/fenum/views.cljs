@@ -14,6 +14,31 @@
          :xmlns "http://www.w3.org/2000/svg", :fill "none", :viewbox "0 0 24 24", :stroke-width "1.5", :stroke "currentColor"}
    [:path {:stroke-linecap "round", :stroke-linejoin "round", :d "M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"}]])
 
+(defn- field-icon [selected?]
+  [:svg {:class "w-6 h-6" :xmlns "http://www.w3.org/2000/svg", :fill "none", :viewbox "0 0 24 24", :stroke-width "1.5", :stroke "currentColor"}
+   [:path {:stroke-linecap "round", :stroke-linejoin "round", :d "M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"}]])
+
+(defn- table [rows]
+  (let [headers (->> rows
+                  first
+                  keys
+                  (map name))]
+    [:table {:class "table-auto w-full text-sm"}
+     [:thead
+      [:tr
+       (for [header headers]
+         ^{:key (str "table-" header)}
+         [:th header])]]
+     [:tbody
+      (for [row rows]
+        ^{:key (str "row-" (:id row))}
+        [:tr
+         (for [cell (->> (vals row)
+                      (map-indexed (fn [index value] {:index index
+                                                      :value value})))]
+           ^{:key (str "cell-" (:id row) "-" (:index cell))}
+           [:td (:value cell)])])]]))
+
 (defn main-panel
   []
   [:div {:class "h-screen flex overflow-hidden bg-white"}
@@ -64,9 +89,11 @@
         [:div {:class "space-y-1 mt-1"}
          (let [tables (re-frame/subscribe [::subscriptions/tables])
                selected-table (re-frame/subscribe [::subscriptions/selected-table])]
-           (for [table (map-indexed (fn [index value]
-                                      (assoc value :index index
-                                                   :selected? (= (:name value) (:name @selected-table)))) @tables)]
+           (for [table (->> @tables
+                         (map-indexed (fn [index value]
+                                        (assoc value :index index
+                                                     :selected? (= (:name value) (:name @selected-table)))))
+                         doall)]
              ^{:key (str "table-" (:index table))}
              [:a {:href "#"
                   :class (str
@@ -79,26 +106,26 @@
               (:name table)]))]]
 
        ;; selected fields
-       [:div {:class "mt-8"}
-        [:h3 {:class "px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" :id "teams-headline"} "Selected fields"]
-        [:div {:class "mt-1 space-y-1" :role "group" :aria-labelledby "teams-headline"}
-         [:a {:href "#" :class "group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"}
-          [:span {:class "w-2.5 h-2.5 mr-4 bg-pink-500 rounded-full" :aria-hidden "true"}]
-          [:span {:class "truncate"} "Engineering"]]
-         [:a {:href "#" :class "group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"}
-          [:span {:class "w-2.5 h-2.5 mr-4 bg-green-500 rounded-full" :aria-hidden "true"}]
-          [:span {:class "truncate"} "Human Resources"]]]]
+       #_[:div {:class "mt-8"}
+          [:h3 {:class "px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" :id "teams-headline"} "Selected fields"]
+          [:div {:class "mt-1 space-y-1" :role "group" :aria-labelledby "teams-headline"}
+           [:a {:href "#" :class "group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"}
+            [:span {:class "w-2.5 h-2.5 mr-4 bg-pink-500 rounded-full" :aria-hidden "true"}]
+            [:span {:class "truncate"} "Engineering"]]
+           [:a {:href "#" :class "group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"}
+            [:span {:class "w-2.5 h-2.5 mr-4 bg-green-500 rounded-full" :aria-hidden "true"}]
+            [:span {:class "truncate"} "Human Resources"]]]]
 
        ;; available fields
        [:div {:class "mt-8"}
         [:h3 {:class "px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" :id "teams-headline"} "Available fields"]
         [:div {:class "mt-1 space-y-1" :role "group" :aria-labelledby "teams-headline"}
-         [:a {:href "#" :class "group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"}
-          [:span {:class "w-2.5 h-2.5 mr-4 bg-pink-500 rounded-full" :aria-hidden "true"}]
-          [:span {:class "truncate"} "Engineering"]]
-         [:a {:href "#" :class "group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"}
-          [:span {:class "w-2.5 h-2.5 mr-4 bg-green-500 rounded-full" :aria-hidden "true"}]
-          [:span {:class "truncate"} "Human Resources"]]]]
+         (let [available-fields (re-frame/subscribe [::subscriptions/available-fields])]
+           (for [field (keys @available-fields)]
+             ^{:key (str "field-" (name field))}
+             [:a {:href "#" :class "group flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:text-gray-900 hover:bg-gray-50"}
+              [:span {:class "w-2.5 h-2.5 mr-4 bg-pink-500 rounded-full" :aria-hidden "true"}]
+              [:span {:class "truncate"} (name field)]]))]]
 
        #_[:div {:class "mt-8"}
           [:h3 {:class "px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider" :id "teams-headline"} "Teams"]
@@ -128,58 +155,65 @@
                  :on-click #(println "TODO - clicked the `To` button")} "To"]]]
 
      ;; results
-     #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
-        [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
-         [:table {:class "w-full text-sm text-left text-gray-500"}
-          [:thead {:class "text-xs text-gray-700 bg-gray-200"}
-           [:tr
-            [:th {:scope "col", :class "py-3 px-6"} "Product name"]
-            [:th {:scope "col", :class "py-3 px-6"}
-             [:div {:class "flex items-center"}
-              [:a {:href "#"}
-               "Color"
-               #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-                  [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-            [:th {:scope "col", :class "py-3 px-6"}
-             [:div {:class "flex items-center"}
-              [:a {:href "#"}
-               "Category"
-               #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-                  [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-            [:th {:scope "col", :class "py-3 px-6"}
-             [:div {:class "flex items-center"}
-              [:a {:href "#"}
-               "Price"
-               #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-                  [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-            [:th {:scope "col", :class "py-3 px-6"}
-             [:span {:class "sr-only"} "Edit"]]]]
-          [:tbody
-           [:tr {:class "bg-white border-b"}
-            [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Apple MacBook Pro 17"]
-            [:td {:class "py-4 px-6"}]
-            [:td {:class "py-4 px-6"}]
-            [:td {:class "py-4 px-6"} "$2999"]
-            [:td {:class "py-4 px-6 text-right"}
-             [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
-           [:tr {:class "bg-white border-b"}
-            [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Microsoft Surface Pro"]
-            [:td {:class "py-4 px-6"}]
-            [:td {:class "py-4 px-6"} "Laptop PC"]
-            [:td {:class "py-4 px-6"} "$1999"]
-            [:td {:class "py-4 px-6 text-right"}
-             [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
-           [:tr {:class "bg-white"}
-            [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Magic Mouse 2"]
-            [:td {:class "py-4 px-6"}]
-            [:td {:class "py-4 px-6"}]
-            [:td {:class "py-4 px-6"} "$99"]
-            [:td {:class "py-4 px-6 text-right"}
-             [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]
+     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
+      [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
+       (let [rows (re-frame/subscribe [::subscriptions/rows])]
+         [table @rows])]]
 
      [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
-      (let [database (re-frame/subscribe [::subscriptions/raw-database])]
-        [:pre (with-out-str (pprint @database))])]
+      [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
+       [:table {:class "w-full text-sm text-left text-gray-500"}
+        [:thead {:class "text-xs text-gray-700 bg-gray-200"}
+         [:tr
+          [:th {:scope "col", :class "py-3 px-6"} "Product name"]
+          [:th {:scope "col", :class "py-3 px-6"}
+           [:div {:class "flex items-center"}
+            [:a {:href "#"}
+             "Color"
+             #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
+                [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
+          [:th {:scope "col", :class "py-3 px-6"}
+           [:div {:class "flex items-center"}
+            [:a {:href "#"}
+             "Category"
+             #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
+                [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
+          [:th {:scope "col", :class "py-3 px-6"}
+           [:div {:class "flex items-center"}
+            [:a {:href "#"}
+             "Price"
+             #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
+                [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
+          [:th {:scope "col", :class "py-3 px-6"}
+           [:span {:class "sr-only"} "Edit"]]]]
+        [:tbody
+         [:tr {:class "bg-white border-b"}
+          [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Apple MacBook Pro 17"]
+          [:td {:class "py-4 px-6"}]
+          [:td {:class "py-4 px-6"}]
+          [:td {:class "py-4 px-6"} "$2999"]
+          [:td {:class "py-4 px-6 text-right"}
+           [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
+         [:tr {:class "bg-white border-b"}
+          [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Microsoft Surface Pro"]
+          [:td {:class "py-4 px-6"}]
+          [:td {:class "py-4 px-6"} "Laptop PC"]
+          [:td {:class "py-4 px-6"} "$1999"]
+          [:td {:class "py-4 px-6 text-right"}
+           [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
+         [:tr {:class "bg-white"}
+          [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Magic Mouse 2"]
+          [:td {:class "py-4 px-6"}]
+          [:td {:class "py-4 px-6"}]
+          [:td {:class "py-4 px-6"} "$99"]
+          [:td {:class "py-4 px-6 text-right"}
+           [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]
+
+     #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
+        (let [database (re-frame/subscribe [::subscriptions/raw-database])]
+          [:pre (with-out-str (pprint (dissoc @database
+                                        :user-dropdown?
+                                        :available-databases)))])]
 
      #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
         [:button

@@ -1,5 +1,6 @@
 (ns fenum.events
   (:require [fenum.db :as db]
+            [fenum.sqlite-db-utils :as sqlite-db-utils]
             [re-frame.core :as re-frame]
             ["tauri-plugin-sql-api$default" :as Database]))
 
@@ -47,7 +48,41 @@
       (fn [tables]
         (re-frame/dispatch [::set-available-tables (js->clj tables :keywordize-keys true)])))))
 
+(re-frame/reg-event-db
+  ::set-available-fields
+  (fn [db [_ fields]]
+    (assoc db :available-fields fields)))
+
+;; query: PRAGMA table_info('tweet');
+(re-frame/reg-fx
+  ::read-fields-fx
+  (fn [[connection table]]
+    ;; As we can't currently evaluate PRAGMA queries we're fetching the first table record and deduct the fields
+    ;;  and types from that.
+    (let [query (str "select * from " (:name table) " limit 1")]
+      (js/console.log query)
+      (.then (.select connection query)
+        (fn [fields]
+          (re-frame/dispatch [::set-available-fields (->> (js->clj fields :keywordize-keys true)
+                                                       first
+                                                       (sqlite-db-utils/row->fields-and-types))]))))))
+
 (re-frame/reg-event-fx
   ::load-table
   (fn [{:keys [db]} [_ table]]
-    {:db (assoc db :selected-table table)}))
+    {:db (assoc db :selected-table table)
+     :fx [[::read-fields-fx [(:database-connection db) table]]
+          [::select-rows-fx [(:database-connection db) table]]]}))
+
+(re-frame/reg-event-db
+  ::set-rows
+  (fn [db [_ rows]]
+    (assoc db :rows rows)))
+
+(re-frame/reg-fx
+  ::select-rows-fx
+  (fn [[connection table]]
+    (let [query (str "select * from " (:name table) " limit 10")]
+      (.then (.select connection query)
+        (fn [rows]
+          (re-frame/dispatch [::set-rows (js->clj rows :keywordize-keys true)]))))))
