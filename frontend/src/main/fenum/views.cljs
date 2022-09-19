@@ -23,12 +23,13 @@
                   first
                   keys
                   (map name))]
-    [:table {:class "table-auto w-full text-sm"}
-     [:thead
+    [:table {:class "border-collapse table-auto w-full text-sm"}
+     [:thead {:class "bg-gray-100 text-gray-700"}
       [:tr
        (for [header headers]
          ^{:key (str "table-" header)}
-         [:th header])]]
+         [:th {:class "border-b font-medium p-4 pl-8 pb-3 text-left"}
+          header])]]
      [:tbody
       (for [row rows]
         ^{:key (str "row-" (:id row))}
@@ -37,7 +38,8 @@
                       (map-indexed (fn [index value] {:index index
                                                       :value value})))]
            ^{:key (str "cell-" (:id row) "-" (:index cell))}
-           [:td (:value cell)])])]]))
+           [:td {:class "border-b border-slate-100 p-4 pl-8 text-slate-800"}
+            (:value cell)])])]]))
 
 (defn main-panel
   []
