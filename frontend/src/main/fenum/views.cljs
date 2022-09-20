@@ -44,7 +44,8 @@
 
 (defn- vega-lite [data]
   (reagent/create-class
-    {:reagent-render (fn [data] [:div {:id "viz"}])
+    {:display-name "vega-lite"
+     :reagent-render (fn [data] [:div {:id "viz"}])
      :component-did-mount (fn []
                             (let [js-data (clj->js data)]
                               (js/vegaEmbed "#viz" js-data)))
