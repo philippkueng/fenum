@@ -3,6 +3,7 @@
             [fenum.subscriptions :as subscriptions]
             [fenum.utilities :as utilities]
             [re-frame.core :as re-frame]
+            [reagent.core :as reagent]
             [cljs.pprint :refer [pprint]]))
 
 (defn- table-icon [selected?]
@@ -40,6 +41,17 @@
            ^{:key (str "cell-" (:id row) "-" (:index cell))}
            [:td {:class "border-b border-slate-100 p-4 pl-8 text-slate-800"}
             (:value cell)])])]]))
+
+(defn- vega-lite [data]
+  (reagent/create-class
+    {:reagent-render (fn [data] [:div {:id "viz"}])
+     :component-did-mount (fn []
+                            (let [js-data (clj->js data)]
+                              (js/vegaEmbed "#viz" js-data)))
+     :component-did-update (fn [this]
+                             (let [[_ data] (reagent/argv this)
+                                   js-data (clj->js data)]
+                               (js/vegaEmbed "#viz" js-data)))}))
 
 (defn main-panel
   []
@@ -156,6 +168,20 @@
        [:button {:class "h-10 px-6 w-1/2 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
                  :on-click #(println "TODO - clicked the `To` button")} "To"]]]
 
+     ;; here I'd like a visualization of the entries within the given time frame
+     (let [rows (re-frame/subscribe [::subscriptions/rows])
+           data {"$schema" "https://vega.github.io/schema/vega-lite/v5.json"
+                 :description "A simple bar chart with embedded data"
+                 :data {:values (->> @rows
+                                  (map (fn [row] {:created_at (:created_at row)
+                                                  :character_count (count (:text row))})))}
+                 :mark "bar"
+                 :encoding {:x {:field "created_at"
+                                :type "ordinal"}
+                            :y {:field "character_count"
+                                :type "quantitative"}}}]
+       [vega-lite data])
+
      ;; results
      [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
       [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
@@ -211,11 +237,11 @@
           [:td {:class "py-4 px-6 text-right"}
            [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]
 
-     #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
-        (let [database (re-frame/subscribe [::subscriptions/raw-database])]
-          [:pre (with-out-str (pprint (dissoc @database
-                                        :user-dropdown?
-                                        :available-databases)))])]
+     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
+      (let [database (re-frame/subscribe [::subscriptions/raw-database])]
+        [:pre (with-out-str (pprint (dissoc @database
+                                      :user-dropdown?
+                                      :available-databases)))])]
 
      #_[:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6 space-x-2"}
         [:button
