@@ -1,0 +1,3 @@
+{:min-bb-version "0.9.161"
+ :paths ["src"]
+ :tasks {repl (shell "bb nrepl-server 1667")}}
