@@ -86,3 +86,8 @@
       (.then (.select connection query)
         (fn [rows]
           (re-frame/dispatch [::set-rows (js->clj rows :keywordize-keys true)]))))))
+
+(re-frame/reg-event-db
+  ::set-tauri-resource-dir
+  (fn [db [_ resource-dir]]
+    (assoc db :tauri-resource-dir resource-dir)))

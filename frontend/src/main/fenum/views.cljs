@@ -238,6 +238,20 @@
           [:td {:class "py-4 px-6 text-right"}
            [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]
 
+     [:div
+      [:h2 {:class "px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"}
+       "Debugging buttons"]
+      [:button {:class "h-10 px-6 w-1/2 border border-transparent text-sm font-medium rounded-md bg-gray-700 text-white shadow-sm"
+                :on-click #(do
+                             (println "clicked the button")
+                             (js/console.log (-> js/window
+                                               (aget "__TAURI__")
+                                               (aget "path")
+                                               ((fn [path] (.resourceDir ^js path)))
+                                               ((fn [promise] (.then ^js promise (fn [directory]
+                                                                                   (re-frame/dispatch [::events/set-tauri-resource-dir directory])))))
+                                               )))} "Read resourceDir"]]
+
      [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
       (let [database (re-frame/subscribe [::subscriptions/raw-database])]
         [:pre (with-out-str (pprint (dissoc @database
