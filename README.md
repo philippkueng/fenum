@@ -1,8 +1,8 @@
-# fenum
+# 🪡fenum
 
 A local simplified Kibana
 
-## tasks
+## 📄tasks
 
 - read lists of nested maps and turn those into maps without nesting
 - generate a schema from a given list of maps -> so datalite can generate tables from it
@@ -19,8 +19,11 @@ A local simplified Kibana
   - add honeysql and datalite as a `frontend` dependency and let the user enter some edn data and then extract the schema from it and create the tables and insert the data
   - add re-frame
   - when the homescreen is initially loaded we should query the SQLite database for the available tables and show some rows
+  - create a babashka script to take a folder of JSON files or a single JSON file and turn it into a SQLite database that can be used by fenum
+  - add babashka again and make it call `.clj` files both in development and when having a production build
+  - [ ] configure the tauri installer to not need admin permissions any longer using https://github.com/tauri-apps/tauri/issues/2319
 
-## development
+## 🧑‍💻development
 
 ```bash
 cd backend/
