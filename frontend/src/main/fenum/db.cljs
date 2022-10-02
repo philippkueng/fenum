@@ -1,7 +1,8 @@
 (ns fenum.db)
 
 (def default-db
-  {:user-dropdown? true
+  {:view :main
+   :user-dropdown? true
    :available-databases [{:name "local database"
                           :path "local.db"}
                          {:name "tweets database"

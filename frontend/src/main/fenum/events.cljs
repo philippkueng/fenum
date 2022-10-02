@@ -15,6 +15,11 @@
     (let [dropdown (:user-dropdown? db)]
       (assoc db :user-dropdown? (not dropdown)))))
 
+(re-frame/reg-event-db
+  ::set-view
+  (fn [db [_ view]]
+    (assoc db :view view)))
+
 (re-frame/reg-event-fx
   ::load-database
   (fn [{:keys [db]} [_ database]]

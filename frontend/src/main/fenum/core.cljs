@@ -10,7 +10,7 @@
   (re-frame/clear-subscription-cache!)
   (let [root-el (utilities/get-element-by-id "app")]
     (rdom/unmount-component-at-node root-el)
-    (rdom/render [views/main-panel] root-el)))
+    (rdom/render [views/window] root-el)))
 
 (defn init []
   ;; init is called ONCE when the page loads

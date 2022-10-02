@@ -34,3 +34,7 @@
 (re-frame/reg-sub
   ::rows
   (fn [db] (:rows db)))
+
+(re-frame/reg-sub
+  ::view
+  (fn [db] (:view db)))
