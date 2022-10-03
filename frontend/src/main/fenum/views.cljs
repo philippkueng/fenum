@@ -24,14 +24,15 @@
                   first
                   keys
                   (map name))]
-    [:table {:class "border-collapse table-auto w-full text-sm"}
-     [:thead {:class "bg-gray-100 text-gray-700"}
+    [:table {:class "min-w-full divide-y divide-gray-200"}
+     [:thead {:class "bg-gray-50"}
       [:tr
        (for [header headers]
          ^{:key (str "table-" header)}
-         [:th {:class "border-b font-medium p-4 pl-8 pb-3 text-left"}
+         [:th {:scope "col"
+               :class "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"}
           header])]]
-     [:tbody
+     [:tbody {:class "bg-white divide-y divide-gray-200"}
       (for [row rows]
         ^{:key (str "row-" (:id row))}
         [:tr
@@ -39,7 +40,7 @@
                       (map-indexed (fn [index value] {:index index
                                                       :value value})))]
            ^{:key (str "cell-" (:id row) "-" (:index cell))}
-           [:td {:class "border-b border-slate-100 p-4 pl-8 text-slate-800"}
+           [:td {:class "px-6 py-4"}
             (:value cell)])])]]))
 
 (defn- vega-lite [data]
@@ -185,58 +186,9 @@
 
     ;; results
     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
-     [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
+     [:div {:class "shadow overflow-hidden border-b border-gray-200 sm:rounded-lg"}
       (let [rows (re-frame/subscribe [::subscriptions/rows])]
         [table @rows])]]
-
-    [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
-     [:div {:class "overflow-x-auto relative shadow-md sm:rounded-md"}
-      [:table {:class "w-full text-sm text-left text-gray-500"}
-       [:thead {:class "text-xs text-gray-700 bg-gray-200"}
-        [:tr
-         [:th {:scope "col", :class "py-3 px-6"} "Product name"]
-         [:th {:scope "col", :class "py-3 px-6"}
-          [:div {:class "flex items-center"}
-           [:a {:href "#"}
-            "Color"
-            #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-               [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-         [:th {:scope "col", :class "py-3 px-6"}
-          [:div {:class "flex items-center"}
-           [:a {:href "#"}
-            "Category"
-            #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-               [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-         [:th {:scope "col", :class "py-3 px-6"}
-          [:div {:class "flex items-center"}
-           [:a {:href "#"}
-            "Price"
-            #_[:svg {:xmlns "http://www.w3.org/2000/svg", :class "ml-1 w-3 h-3", :aria-hidden "true", :fill "currentColor", :viewbox "0 0 320 512"}
-               [:path {:d "M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z"}]]]]]
-         [:th {:scope "col", :class "py-3 px-6"}
-          [:span {:class "sr-only"} "Edit"]]]]
-       [:tbody
-        [:tr {:class "bg-white border-b"}
-         [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Apple MacBook Pro 17"]
-         [:td {:class "py-4 px-6"}]
-         [:td {:class "py-4 px-6"}]
-         [:td {:class "py-4 px-6"} "$2999"]
-         [:td {:class "py-4 px-6 text-right"}
-          [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
-        [:tr {:class "bg-white border-b"}
-         [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Microsoft Surface Pro"]
-         [:td {:class "py-4 px-6"}]
-         [:td {:class "py-4 px-6"} "Laptop PC"]
-         [:td {:class "py-4 px-6"} "$1999"]
-         [:td {:class "py-4 px-6 text-right"}
-          [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]
-        [:tr {:class "bg-white"}
-         [:th {:scope "row", :class "py-4 px-6 font-medium text-gray-900 whitespace-nowrap"} "Magic Mouse 2"]
-         [:td {:class "py-4 px-6"}]
-         [:td {:class "py-4 px-6"}]
-         [:td {:class "py-4 px-6"} "$99"]
-         [:td {:class "py-4 px-6 text-right"}
-          [:a {:href "#", :class "font-medium text-blue-600 hover:underline"} "Edit"]]]]]]]
 
     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
      [:h2 {:class "px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"}
