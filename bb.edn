@@ -4,7 +4,12 @@
                 :task (do (fs/delete-tree "frontend/.cpcache")
                           (fs/delete-tree "frontend/.shadow-cljs")
                           (fs/delete-tree "frontend/.vscode"))}
-         dev-frontend (shell {:dir "frontend"} "npm run dev")
+         dev-frontend {:requires ([babashka.fs :as fs])
+                       :task (do
+                               (fs/copy
+                                 "frontend/node_modules/@tremor/react/dist/esm/tremor.css"
+                                 "frontend/public/css/tremor.css")
+                               (shell {:dir "frontend"} "npm run dev"))}
          dev-backend (shell {:dir "backend"} "npm run tauri dev")
          ;-dev {:depends [dev-frontend dev-backend]}
          ;dev {:doc "Starts the front- and backend"

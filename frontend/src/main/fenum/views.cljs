@@ -4,7 +4,8 @@
             [fenum.utilities :as utilities]
             [re-frame.core :as re-frame]
             [reagent.core :as reagent]
-            [cljs.pprint :refer [pprint]]))
+            [cljs.pprint :refer [pprint]]
+            ["@tremor/react" :refer [Datepicker]]))
 
 (defn- table-icon [selected?]
   [:svg {:class (str
@@ -54,6 +55,9 @@
                              (let [[_ data] (reagent/argv this)
                                    js-data (clj->js data)]
                                (js/vegaEmbed "#viz" js-data)))}))
+
+(defn datepicker []
+  [(reagent/adapt-react-class Datepicker) {}])
 
 (defn sidebar []
   [:div {:class "hidden lg:flex lg:flex-shrink-0"}
@@ -211,6 +215,11 @@
               :on-change #(do (println (-> % .-target .-value))
                               (js/console.log (-> % .-target .-files)))
               :accept ".sqlite"}]]
+
+    [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
+     [:h2 {:class "px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider"}
+      "Tremor integration"]
+     [datepicker]]
 
     [:div {:class "px-4 mt-6 sm:px-6 lg:px-8 mt-6"}
      (let [database (re-frame/subscribe [::subscriptions/raw-database])]
