@@ -2,7 +2,7 @@
 
 (def default-db
   {:view :main
-   :user-dropdown? true
+   :database-selection-enabled? false
    :available-databases [{:name "local database"
                           :path "local.db"}
                          {:name "tweets database"

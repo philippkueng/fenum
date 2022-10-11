@@ -12,8 +12,8 @@
 (re-frame/reg-event-db
   ::toggle-user-dropdown
   (fn [db _]
-    (let [dropdown (:user-dropdown? db)]
-      (assoc db :user-dropdown? (not dropdown)))))
+    (let [dropdown (:database-selection-enabled? db)]
+      (assoc db :database-selection-enabled? (not dropdown)))))
 
 (re-frame/reg-event-db
   ::set-view

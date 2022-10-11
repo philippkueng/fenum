@@ -4,7 +4,7 @@
 (re-frame/reg-sub
   ::user-dropdown?
   (fn [db]
-    (:user-dropdown? db)))
+    (:database-selection-enabled? db)))
 
 (re-frame/reg-sub
   ::available-databases
